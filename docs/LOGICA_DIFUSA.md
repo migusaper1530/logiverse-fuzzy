@@ -67,13 +67,45 @@ su JSON y exportar `ventilacion_trapezoidal.fis` para MATLAB.
 Al final de la pantalla hay dos botones:
 
 - **Cargar archivo** abre el explorador para seleccionar un `.fis` de hasta
-  2 MB. Abre ese sistema directamente en Fuzzy Logic Designer de MATLAB.
+  2 MB en la versión local. Abre ese sistema directamente en Fuzzy Logic Designer de MATLAB.
   Cancelar la selección no inicia MATLAB ni modifica el diseño de la página.
 - **Abrir MATLAB** inicia MATLAB directamente en Fuzzy Logic Designer, sin
   cargar un archivo. Para abrir el diseño actual, primero exporta su `.fis`
   y selecciónalo con **Cargar archivo**.
 
-Para usar estos botones, ejecuta desde la raíz del proyecto:
+### Desde GitHub Pages en una computadora Windows
+
+Instalar y activar MATLAB no registra automáticamente una conexión con esta
+página. Para usar los botones en esa computadora:
+
+1. Pulsa **Descargar conector para Windows** y extrae todo el ZIP.
+2. Ejecuta `Instalar-conector.cmd` y selecciona el `matlab.exe` de tu versión
+   activada, por ejemplo `C:\Program Files\MATLAB\R2026b\bin\matlab.exe`.
+3. Regresa a la página publicada y pulsa **Abrir MATLAB** o **Cargar archivo**.
+4. Confirma **Abrir LogiVerse MATLAB** en el navegador. Si cancelas ese aviso,
+   MATLAB no se inicia.
+
+**Cargar archivo** abre el explorador de Windows desde el conector y después
+abre el `.fis` elegido en el diseñador. No sube el archivo a GitHub ni a un
+servidor. **Abrir MATLAB** inicia el diseñador sin cargar un archivo. La página
+solo confirma que envió la solicitud al conector; los errores de MATLAB se
+muestran en Windows. No puede comprobar desde el navegador que la ventana se
+haya abierto.
+
+El conector requiere Windows con .NET Framework 4 y MATLAB con Fuzzy Logic
+Toolbox activado. Se instala para el usuario en `%LOCALAPPDATA%\LogiVerseMatlab`
+y registra `logiverse-matlab` en `HKCU\Software\Classes`. No necesita Python,
+Flutter, puertos abiertos ni cambios en la política de ejecución. El protocolo
+solo acepta las acciones `fuzzy` y `cargar`; no admite código MATLAB ni rutas
+procedentes de la web. Si cambias de versión de MATLAB, repite la instalación.
+Para retirarlo, usa `Desinstalar-conector.cmd` del ZIP.
+
+El ejecutable se compila y prueba en un runner Windows de GitHub Actions antes
+de incluirlo en la página. Su código fuente está en `tools/windows_matlab/`.
+
+### Desde la aplicación local
+
+Para usar el servidor local, ejecuta desde la raíz del proyecto:
 
 ```sh
 flutter build web --base-href /
@@ -90,10 +122,10 @@ Puedes borrar esas carpetas cuando hayas terminado y cerrado MATLAB.
 En una sesión Linux Wayland, el servidor usa el backend X11 de Qt a través de
 XWayland para el proceso de MATLAB; no modifica la configuración del escritorio.
 
-La conexión funciona con este servidor local; la versión de GitHub Pages y un
-servidor estático común permiten exportar archivos, pero no iniciar MATLAB.
+La conexión Python funciona con este servidor local. La página publicada usa
+el conector de Windows; un servidor estático común no ofrece la API Python.
 El navegador envía únicamente el `.fis` elegido al servidor de la misma página,
-que escucha en `127.0.0.1`. No es necesario un servicio en Internet.
+que escucha en `127.0.0.1`. No es necesario un servicio en Internet para MATLAB.
 
 También puedes abrirlo manualmente:
 

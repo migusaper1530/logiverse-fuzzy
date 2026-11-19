@@ -1,0 +1,26 @@
+LOGIVERSE - MATLAB EN WINDOWS
+
+Instala este conector en la computadora que tiene MATLAB activado.
+
+1. Descarga el ZIP desde LogiVerse y extrae todos sus archivos.
+2. Ejecuta Instalar-conector.cmd.
+3. Elige matlab.exe de la version que usas. Suele estar en:
+   C:\Program Files\MATLAB\R2026b\bin\matlab.exe
+   La carpeta R2026b puede tener otro nombre segun tu version.
+4. Regresa a la pagina y pulsa Abrir MATLAB o Cargar archivo.
+5. Confirma Abrir LogiVerse MATLAB en el aviso del navegador.
+
+Abrir MATLAB inicia Fuzzy Logic Designer.
+Cargar archivo abre el explorador de Windows para seleccionar un .fis
+y despues abre ese sistema en Fuzzy Logic Designer.
+MATLAB debe tener Fuzzy Logic Toolbox instalado y activado.
+
+El conector se instala para tu usuario en %LOCALAPPDATA%\LogiVerseMatlab
+y registra unicamente el protocolo logiverse-matlab. No usa servidores,
+puertos de red, Python ni Flutter. No cambia tu licencia de MATLAB.
+Solo admite abrir el disenador o seleccionar un .fis; no acepta comandos
+MATLAB ni rutas de archivos enviados por una pagina web.
+
+Si cambias de version, vuelve a ejecutar Instalar-conector.cmd.
+Para retirar la conexion, ejecuta Desinstalar-conector.cmd.
+El ejecutable se compila en GitHub Actions desde tools/windows_matlab/Connector.cs.

@@ -4,6 +4,8 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import 'matlab_protocol.dart' as protocol;
+
 class MatlabFisFile {
   const MatlabFisFile(this.name, this.content);
   final String name;
@@ -30,6 +32,8 @@ class MatlabLaunchService {
     this.baseUri,
     this.pollInterval = const Duration(seconds: 1),
     this.maxPolls = 125,
+    this.windowsRequest = protocol.requestWindowsMatlab,
+    this.windowsDownload = protocol.downloadWindowsConnector,
   });
 
   final MatlabFilePicker picker;
@@ -37,6 +41,20 @@ class MatlabLaunchService {
   final Uri? baseUri;
   final Duration pollInterval;
   final int maxPolls;
+  final void Function(bool selectFile) windowsRequest;
+  final void Function(Uri uri) windowsDownload;
+
+  Uri get _pageUri =>
+      baseUri ?? (kIsWeb ? Uri.base : Uri.parse('http://127.0.0.1:4187'));
+
+  bool get requiresWindowsConnector =>
+      !{'localhost', '127.0.0.1'}.contains(_pageUri.host);
+
+  void requestWindowsFuzzy({required bool selectFile}) =>
+      windowsRequest(selectFile);
+
+  void downloadConnector() =>
+      windowsDownload(_pageUri.resolve('matlab/Conector-MATLAB-Windows.zip'));
 
   Future<MatlabFisFile?> pickFile() async {
     final file = await picker();
@@ -62,8 +80,7 @@ class MatlabLaunchService {
 
   Future<void> openFuzzy({MatlabFisFile? file}) async {
     file?.validate();
-    final uri =
-        baseUri ?? (kIsWeb ? Uri.base : Uri.parse('http://127.0.0.1:4187'));
+    final uri = _pageUri;
     if (!{'localhost', '127.0.0.1'}.contains(uri.host) ||
         uri.scheme != 'http') {
       throw const FormatException(

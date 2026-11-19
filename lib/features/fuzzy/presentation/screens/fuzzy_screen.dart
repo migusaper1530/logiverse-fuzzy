@@ -37,6 +37,21 @@ class _FuzzyScreenState extends State<FuzzyScreen> {
 
   Future<void> _openMatlab({bool selectFile = false}) async {
     if (_matlabBusy) return;
+    if (widget.matlabService.requiresWindowsConnector) {
+      try {
+        widget.matlabService.requestWindowsFuzzy(selectFile: selectFile);
+        setState(
+          () => _matlabStatus =
+              'Solicitud enviada al conector de Windows. Confirma «Abrir LogiVerse MATLAB» en el navegador. '
+              'Si no aparece el aviso, instala el conector y vuelve a pulsar el botón.',
+        );
+      } catch (_) {
+        setState(
+          () => _matlabStatus = 'Instala el conector en la computadora Windows que tiene MATLAB y vuelve a intentarlo.',
+        );
+      }
+      return;
+    }
     setState(() => _matlabBusy = true);
     try {
       final file = selectFile ? await widget.matlabService.pickFile() : null;
@@ -331,7 +346,7 @@ class _FuzzyScreenState extends State<FuzzyScreen> {
             '3. Edita los conjuntos y revisa sus curvas. Triangular: a ≤ b ≤ c, a < c. Trapezoidal: a ≤ b ≤ c ≤ d, a < d. Gaussiana: sigma > 0 y centro. Los parámetros pueden extenderse fuera del rango. Usa punto decimal.\n\n'
             '4. Crea reglas con Y (mínimo) u O (máximo) y peso entre 0 y 1. «Cualquiera» ignora una entrada; «Sin efecto» ignora una salida. Cada regla debe usar al menos una entrada y una salida.\n\n'
             '5. Guarda el diseño JSON para recuperarlo y editarlo después. Cargar JSON, usar el ejemplo o empezar de nuevo reemplaza el diseño actual. Eliminar una variable o conjunto elimina las reglas que lo utilizan.\n\n'
-            '6. Exporta el .fis. Al final de la página, «Cargar archivo» permite elegirlo en el explorador y abrirlo en Fuzzy Logic Designer. «Abrir MATLAB» abre el diseñador sin cargar un archivo. Estos botones requieren la aplicación local y MATLAB con Fuzzy Logic Toolbox y licencia activa. También puedes abrirlo manualmente:\n\n'
+            '6. Exporta el .fis. Al final de la página, «Cargar archivo» permite elegirlo en el explorador y abrirlo en Fuzzy Logic Designer. «Abrir MATLAB» abre el diseñador sin cargar un archivo. En la página publicada, instala una vez el conector para Windows en la computadora que tiene MATLAB. La versión local también admite el servidor Python. Requiere Fuzzy Logic Toolbox y licencia activa. También puedes abrirlo manualmente:\n\n'
             'fis = readfis("ventilacion.fis");\nfuzzyLogicDesigner(fis);\n\n'
             'Sustituye ventilacion por el nombre de tu archivo. Para evaluar el ejemplo:\n\n'
             'salida = evalfis(fis, [30 70]);\n\n'
@@ -662,6 +677,27 @@ class _FuzzyScreenState extends State<FuzzyScreen> {
                         'Selecciona un archivo .fis para abrirlo en MATLAB, o inicia el diseñador sin cargar un archivo. Requiere MATLAB con Fuzzy Logic Toolbox y licencia activa en esta computadora.',
                       ),
                       const SizedBox(height: 16),
+                      if (widget.matlabService.requiresWindowsConnector) ...[
+                        const Text(
+                          'Conecta MATLAB en Windows una sola vez:\n'
+                          '1. Descarga el conector y extrae el ZIP.\n'
+                          '2. Ejecuta Instalar-conector.cmd y selecciona el matlab.exe de tu versión activada.\n'
+                          '3. Vuelve aquí, pulsa un botón y confirma «Abrir LogiVerse MATLAB» en el navegador.\n\n'
+                          '«Cargar archivo» abrirá el explorador de Windows para elegir el .fis. El conector debe estar en la misma computadora donde usas esta página y MATLAB.',
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: OutlinedButton.icon(
+                            onPressed: widget.matlabService.downloadConnector,
+                            icon: const Icon(Icons.download_outlined),
+                            label: const Text(
+                              'Descargar conector para Windows',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       Wrap(
                         spacing: 12,
                         runSpacing: 12,

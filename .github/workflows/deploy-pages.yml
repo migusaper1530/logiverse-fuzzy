@@ -13,10 +13,38 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  windows-connector:
+    name: Compilar y probar el conector de Windows
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - name: Compilar y probar
+        shell: pwsh
+        run: |
+          $compiler = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+          New-Item -ItemType Directory -Force package, fake | Out-Null
+          & $compiler /nologo /codepage:65001 /target:winexe /out:package/LogiVerseMatlab.exe /reference:System.Windows.Forms.dll tools/windows_matlab/Connector.cs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $compiler /nologo /target:exe /out:fake/matlab.exe tools/windows_matlab/FakeMatlab.cs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $compiler /nologo /codepage:65001 /target:exe /out:package/ConnectorTests.exe /reference:package/LogiVerseMatlab.exe /reference:System.Windows.Forms.dll tools/windows_matlab/ConnectorTests.cs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & ./package/ConnectorTests.exe (Resolve-Path ./fake/matlab.exe).Path
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Remove-Item package/ConnectorTests.exe
+          Copy-Item tools/windows_matlab/*.cmd, tools/windows_matlab/LEEME.txt package/
+          Compress-Archive -Path package/* -DestinationPath Conector-MATLAB-Windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conector-matlab-windows
+          path: Conector-MATLAB-Windows.zip
+
   build:
     name: Verificar y compilar la app
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    needs: windows-connector
     permissions:
       contents: read
       pages: read
@@ -42,6 +70,12 @@ jobs:
 
       - name: Verificar la conexión local con MATLAB
         run: python3 -m unittest discover -s tools -p 'test_*.py'
+
+      - name: Incluir el conector para Windows
+        uses: actions/download-artifact@v4
+        with:
+          name: conector-matlab-windows
+          path: web/matlab
 
       - name: Obtener la ruta de GitHub Pages
         id: pages

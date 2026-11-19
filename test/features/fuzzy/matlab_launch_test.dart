@@ -100,6 +100,50 @@ void main() {
 
   for (final size in [const Size(320, 700), const Size(1280, 900)]) {
     testWidgets(
+      'la página publicada usa el conector Windows sin enviar archivos a localhost a ${size.width}',
+      (tester) async {
+        final requests = <bool>[];
+        Uri? download;
+        final launcher = MatlabLaunchService(
+          baseUri: Uri.parse(
+            'https://migusaper1530.github.io/logiverse-fuzzy/#/algoritmos/fuzzy',
+          ),
+          windowsRequest: requests.add,
+          windowsDownload: (uri) => download = uri,
+          picker: () async => throw StateError(
+            'El archivo se elige en Windows, no en el navegador.',
+          ),
+          clientFactory: () => throw StateError(
+            'No se llama al servidor local desde GitHub Pages.',
+          ),
+        );
+        await openScreen(
+          tester,
+          FuzzyScreen(matlabService: launcher),
+          size: size,
+          scale: 1.3,
+        );
+        await tapText(tester, 'Descargar conector para Windows');
+        expect(
+          download.toString(),
+          'https://migusaper1530.github.io/logiverse-fuzzy/matlab/Conector-MATLAB-Windows.zip',
+        );
+        await tapText(tester, 'Abrir MATLAB');
+        await tapText(tester, 'Cargar archivo');
+        expect(requests, [false, true]);
+        expect(
+          find.textContaining('Solicitud enviada al conector de Windows.'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Fuzzy Logic Designer está abierto en MATLAB.'),
+          findsNothing,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
       'botones abren diseñador, cancelan y permiten reintentar a ${size.width}',
       (tester) async {
         var canceled = true;

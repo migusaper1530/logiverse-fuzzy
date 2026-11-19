@@ -65,6 +65,11 @@ de reproducción en `providers/sorting_visualization_provider.dart`.
   El servidor se limita a loopback, comprueba Host/Origin y token de sesión,
   no admite comandos arbitrarios y confirma el inicio mediante un archivo
   escrito por MATLAB después de ejecutar el comando del diseñador.
+  En GitHub Pages se usa `matlab_protocol_web.dart` y el protocolo registrado
+  `logiverse-matlab` para llamar al conector nativo de `tools/windows_matlab/`.
+  El conector selecciona el archivo en Windows y solo admite dos acciones
+  fijas; no recibe código ni rutas desde la página. El workflow compila y
+  prueba el ejecutable en Windows y publica su ZIP junto con la web.
 - **`shared/graph_editor/`:** modelos mutables del editor y geometría de
   conexiones. `Nodo` y `Conexion` contienen tipos gráficos de `dart:ui` y no
   forman parte del dominio matemático.

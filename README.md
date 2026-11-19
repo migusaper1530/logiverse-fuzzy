@@ -99,8 +99,16 @@ flutter pub get
 flutter run -d chrome
 ```
 
-Para usar los botones **Cargar archivo** y **Abrir MATLAB** al final del módulo
-de lógica difusa, sirve la aplicación con la conexión local (Python 3):
+En **GitHub Pages con Windows**, usa **Descargar conector para Windows** al final
+del módulo de lógica difusa. Extrae el ZIP, ejecuta `Instalar-conector.cmd` y
+selecciona el `matlab.exe` de tu versión activada. Después, los botones
+**Cargar archivo** y **Abrir MATLAB** abren Fuzzy Logic Designer mediante el
+conector. Acepta el aviso del navegador para abrir LogiVerse MATLAB.
+La instalación se hace en la misma computadora que tiene MATLAB; no requiere
+Python, Flutter ni permisos de administrador.
+
+Para usar los botones desde la aplicación **local**, sírvela con la conexión
+local (Python 3):
 
 ```sh
 flutter build web --base-href /
