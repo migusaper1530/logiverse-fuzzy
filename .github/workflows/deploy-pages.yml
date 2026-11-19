@@ -24,11 +24,11 @@ jobs:
         run: |
           $compiler = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
           New-Item -ItemType Directory -Force package, fake | Out-Null
-          & $compiler /nologo /codepage:65001 /target:winexe /out:package/LogiVerseMatlab.exe /reference:System.Windows.Forms.dll tools/windows_matlab/Connector.cs
+          & $compiler /nologo /codepage:65001 /target:winexe /out:package\LogiVerseMatlab.exe /reference:System.Windows.Forms.dll tools\windows_matlab\Connector.cs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & $compiler /nologo /target:exe /out:fake/matlab.exe tools/windows_matlab/FakeMatlab.cs
+          & $compiler /nologo /target:exe /out:fake\matlab.exe tools\windows_matlab\FakeMatlab.cs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & $compiler /nologo /codepage:65001 /target:exe /out:package/ConnectorTests.exe /reference:package/LogiVerseMatlab.exe /reference:System.Windows.Forms.dll tools/windows_matlab/ConnectorTests.cs
+          & $compiler /nologo /codepage:65001 /target:exe /out:package\ConnectorTests.exe /reference:package\LogiVerseMatlab.exe /reference:System.Windows.Forms.dll tools\windows_matlab\ConnectorTests.cs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & ./package/ConnectorTests.exe (Resolve-Path ./fake/matlab.exe).Path
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
